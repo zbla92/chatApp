@@ -1,0 +1,38 @@
+{
+	"env": {
+		"browser": false,
+		"node": true,
+		"jest": true
+	},
+	"parser": "babel-eslint",
+	"plugins": ["prettier","jest", "node"],
+	"extends": ["airbnb", "prettier"],
+	"rules": {
+		"prettier/prettier": ["error"],
+		"import/prefer-default-export": 0,
+		"no-param-reassign": "warn",
+		"jsx-a11y/label-has-for": [
+			2,
+			{
+				"components": ["Label"],
+				"required": {
+					"some": ["nesting", "id"]
+				},
+				"allowChildren": false
+			}
+		],
+		"jsx-a11y/anchor-is-valid": [
+			"error",
+			{
+				"components": ["Link"],
+				"specialLink": ["hrefLeft", "hrefRight"],
+				"aspects": ["invalidHref", "preferButton"]
+			}
+		],
+		"jsx-a11y/label-has-associated-control": 0,
+		"import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+		"no-unused-vars": ["warn", { "vars": "all", "args": "none", "ignoreRestSiblings": false }],
+		"no-extra-boolean-cast": 0,
+		"no-lonely-if": 0
+	}
+}
