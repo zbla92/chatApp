@@ -3,6 +3,8 @@ const {
   generateAccessToken,
   generateRefreshToken,
   destroyToken,
+  jwtAuth,
+  verifyRefreshToken,
 } = require('../config/auth');
 require('dotenv').config();
 
@@ -98,4 +100,22 @@ exports.logout = async (ctx, next) => {
   } catch (err) {
     ctx.throw(500, err);
   }
+};
+
+exports.renewToken = async (ctx, next) => {
+  const { refreshToken, userId } = ctx.request.body;
+
+  const dbRefreshToken = await RefreshToken.findOne({
+    where: { userId },
+  });
+
+  if (refreshToken == null) {
+    ctx.status = 401;
+    return null;
+  }
+  if (dbRefreshToken.value !== refreshToken) {
+    ctx.status = 403;
+    return null;
+  }
+  verifyRefreshToken(ctx, refreshToken);
 };

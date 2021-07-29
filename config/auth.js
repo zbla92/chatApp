@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const refreshToken = require('../models/refreshToken');
 require('dotenv').config();
 
 exports.jwtAuth = async (ctx, next) => {
@@ -23,4 +24,19 @@ exports.generateAccessToken = (user) => {
 
 exports.generateRefreshToken = (user) => {
   return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+};
+
+/**
+ * @param {object} ctx Pass through ctx
+ * @param {string} refreshToken refreshToken
+ */
+exports.verifyRefreshToken = (ctx, refreshToken) => {
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      ctx.response = 403;
+      return;
+    }
+    const accessToken = this.generateAccessToken(user);
+    ctx.body = { accessToken };
+  });
 };

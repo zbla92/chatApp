@@ -7,6 +7,7 @@ const {
   login,
   getUser,
   logout,
+  renewToken,
 } = require('../controllers/user');
 
 const router = new Router({ prefix: '/user' });
@@ -17,6 +18,6 @@ router.post('/create', createNewUser);
 router.delete('/:id', deleteUser);
 router.post('/login', login);
 router.post('/logout/:userId', jwtAuth, logout);
-// router.token('/token', renewToken)
+router.post('/auth/refresh', renewToken);
 
 module.exports = router;
