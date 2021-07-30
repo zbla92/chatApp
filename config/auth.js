@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const refreshToken = require('../models/refreshToken');
 require('dotenv').config();
 
 exports.jwtAuth = async (ctx, next) => {

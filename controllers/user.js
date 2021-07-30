@@ -66,8 +66,14 @@ exports.deleteUser = async (ctx, next) => {
 
 exports.login = async (ctx, next) => {
   try {
-    const { email } = ctx.request.body;
+    const { email, password } = ctx.request.body;
     const userData = await User.findOne({ where: { email } });
+
+    if(password !== userData.password){
+      ctx.status = 403;
+      ctx.body = {error: 'Incorrect password.'}
+      return
+    }
 
     const user = {
       email: userData.email,
@@ -113,7 +119,7 @@ exports.renewToken = async (ctx, next) => {
     ctx.status = 401;
     return null;
   }
-  if (dbRefreshToken.value !== refreshToken) {
+  if (dbRefreshToken?.value !== refreshToken) {
     ctx.status = 403;
     return null;
   }
