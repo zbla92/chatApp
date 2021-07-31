@@ -1,12 +1,12 @@
-const { User, RefreshToken } = require('../models');
+const { User, RefreshToken } = require("../models");
 const {
   generateAccessToken,
   generateRefreshToken,
   destroyToken,
   jwtAuth,
   verifyRefreshToken,
-} = require('../config/auth');
-require('dotenv').config();
+} = require("../config/auth");
+require("dotenv").config();
 
 exports.getAllUsers = async (ctx, next) => {
   try {
@@ -24,8 +24,8 @@ exports.getUser = async (ctx, next) => {
       include: [
         {
           model: RefreshToken,
-          as: 'refreshToken',
-          attributes: ['id', 'value'],
+          as: "refreshToken",
+          attributes: ["id", "value"],
         },
       ],
     });
@@ -65,14 +65,15 @@ exports.deleteUser = async (ctx, next) => {
 };
 
 exports.login = async (ctx, next) => {
+  console.log(ctx.request.body, "BODY ON ME");
   try {
     const { email, password } = ctx.request.body;
     const userData = await User.findOne({ where: { email } });
 
-    if(password !== userData.password){
+    if (password !== userData?.password) {
       ctx.status = 403;
-      ctx.body = {error: 'Incorrect password.'}
-      return
+      ctx.body = { error: "Incorrect password." };
+      return;
     }
 
     const user = {
@@ -90,7 +91,7 @@ exports.login = async (ctx, next) => {
       { where: { userId: userData.id } }
     );
 
-    ctx.body = { tokenType: 'Bearer', accessToken, refreshToken };
+    ctx.body = { tokenType: "Bearer", accessToken, refreshToken };
   } catch (err) {
     ctx.throw(500, err);
   }
