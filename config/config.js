@@ -1,5 +1,18 @@
 require('dotenv').config();
 
+/*
+	DATABASE_URL is received from Heroku and it has format as shown below:
+	postgres://DATABASE_USER:DATABASE_PASSWORD@DATABASE_HOST/DATABASE_NAME
+	In order to extract this data we need to match it against regex patterns.
+*/
+const DB_USER = process.env.DATABASE_URL.match(/\/\/\w+:/)[0].slice(2, -1);
+const DB_PASSWORD = process.env.DATABASE_URL.match(/:\w+@/)[0].slice(1, -1);
+// After match with the URL, we also need to get rid of the port part
+const DB_HOST = process.env.DATABASE_URL.match(/@[\w+._-]+:\d{1,4}\//)[0]
+  .slice(1, -1)
+  .split(':')[0];
+const DB_NAME = process.env.DATABASE_URL.match(/\b\/\w+\b/)[0].slice(1);
+
 module.exports = {
   development: {
     username: process.env.DB_USER,
@@ -9,22 +22,20 @@ module.exports = {
     dialect: 'postgres',
   },
   staging: {
-    username: 'nneoczyuzbblhf',
-    password:
-      'd6206dae8b36cdd0bd9cefb615133b829531266ac795018ff4830de602bd6561',
-    database: 'dbuacvoisghlgq',
-    host: 'ec2-3-230-38-145.compute-1.amazonaws.com',
+    username: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    host: DB_HOST,
     dialect: 'postgres',
     dialectOptions: {
       ssl: { rejectUnauthorized: false },
     },
   },
   production: {
-    username: 'nneoczyuzbblhf',
-    password:
-      'd6206dae8b36cdd0bd9cefb615133b829531266ac795018ff4830de602bd6561',
-    database: 'dbuacvoisghlgq',
-    host: 'ec2-3-230-38-145.compute-1.amazonaws.com',
+    username: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    host: DB_HOST,
     dialect: 'postgres',
     dialectOptions: {
       ssl: { rejectUnauthorized: false },
