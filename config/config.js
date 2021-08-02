@@ -8,18 +8,26 @@ module.exports = {
     host: process.env.DB_HOST,
     dialect: 'postgres',
   },
-  test: {
-    username: 'root',
-    password: null,
-    database: 'database_test',
-    host: '127.0.0.1',
-    dialect: 'mysql',
+  staging: {
+    username: 'nneoczyuzbblhf',
+    password:
+      'd6206dae8b36cdd0bd9cefb615133b829531266ac795018ff4830de602bd6561',
+    database: 'dbuacvoisghlgq',
+    host: 'ec2-3-230-38-145.compute-1.amazonaws.com',
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: { rejectUnauthorized: false },
+    },
   },
   production: {
-    username: 'root',
-    password: null,
-    database: 'database_production',
-    host: '127.0.0.1',
-    dialect: 'mysql',
+    username: 'nneoczyuzbblhf',
+    password:
+      'd6206dae8b36cdd0bd9cefb615133b829531266ac795018ff4830de602bd6561',
+    database: 'dbuacvoisghlgq',
+    host: 'ec2-3-230-38-145.compute-1.amazonaws.com',
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: { rejectUnauthorized: false },
+    },
   },
 };
