@@ -70,7 +70,9 @@ exports.login = async (ctx, next) => {
     const { email, password } = ctx.request.body;
     const userData = await User.findOne({ where: { email } });
 
-    if (password !== userData?.password) {
+    const isValid = await userData.validPassword(password);
+
+    if (!isValid) {
       ctx.status = 403;
       ctx.body = { error: "Incorrect password." };
       return;
