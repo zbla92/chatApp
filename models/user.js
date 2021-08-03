@@ -1,5 +1,7 @@
-'use strict';
-const { Model } = require('sequelize');
+"use strict";
+const bcrypt = require("bcrypt");
+
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -9,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       User.hasOne(models.RefreshToken, {
-        as: 'refreshToken',
-        foreignKey: 'userId',
-        onDelete: 'cascade',
+        as: "refreshToken",
+        foreignKey: "userId",
+        onDelete: "cascade",
       });
     }
   }
@@ -26,8 +28,20 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'User',
+      modelName: "User",
     }
   );
+
+  User.prototype.validPassword = async function (password) {
+    return bcrypt.compare(password, this.password);
+  };
+
+  User.beforeSave(async (user, options) => {
+    if (user.password) {
+      const salt = await bcrypt.genSalt(5);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+
   return User;
 };
