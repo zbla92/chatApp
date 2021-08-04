@@ -65,16 +65,21 @@ exports.deleteUser = async (ctx, next) => {
 };
 
 exports.login = async (ctx, next) => {
-  console.log(ctx.request.body, "BODY ON ME");
   try {
     const { email, password } = ctx.request.body;
     const userData = await User.findOne({ where: { email } });
 
-    const isValid = await userData.validPassword(password);
+    if (!userData) {
+      ctx.status = 404;
+      ctx.body = { error: "User not found." };
+      return;
+    }
+
+    const isValid = await userData?.validPassword(password);
 
     if (!isValid) {
       ctx.status = 403;
-      ctx.body = { error: "Incorrect password." };
+      ctx.body = { error: "Password is incorrect." };
       return;
     }
 
