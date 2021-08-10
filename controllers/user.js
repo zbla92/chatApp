@@ -113,7 +113,7 @@ exports.logout = async (req, res) => {
   try {
     const result = await RefreshToken.update(
       { value: null },
-      { where: { userId: ctx.params.userId } }
+      { where: { userId: req.params.userId } }
     );
     res.status(204).end();
   } catch (error) {
@@ -123,7 +123,7 @@ exports.logout = async (req, res) => {
 };
 
 exports.renewToken = async (req, res) => {
-  const { refreshToken, userId } = ctx.request.body;
+  const { refreshToken, userId } = req.body;
 
   const dbRefreshToken = await RefreshToken.findOne({
     where: { userId },
