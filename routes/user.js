@@ -1,4 +1,5 @@
-const Router = require('koa-router');
+const express = require('express');
+
 const { jwtAuth } = require('../config/auth');
 const {
   getAllUsers,
@@ -10,14 +11,14 @@ const {
   renewToken,
 } = require('../controllers/user');
 
-const router = new Router({ prefix: '/user' });
+const router = express.Router();
 
 router.get('/', jwtAuth, getAllUsers);
-router.get('/:id', jwtAuth, getUser);
+router.get('/:id', getUser);
 router.post('/create', createNewUser);
 router.delete('/:id', deleteUser);
 router.post('/login', login);
-router.post('/logout/:userId', jwtAuth, logout);
+router.post('/logout/:userId', logout);
 router.post('/auth/refresh', renewToken);
 
 module.exports = router;

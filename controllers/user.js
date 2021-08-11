@@ -1,44 +1,45 @@
-const { User, RefreshToken } = require("../models");
+const { User, RefreshToken } = require('../models');
 const {
   generateAccessToken,
   generateRefreshToken,
   destroyToken,
   jwtAuth,
   verifyRefreshToken,
-} = require("../config/auth");
-require("dotenv").config();
+} = require('../config/auth');
+require('dotenv').config();
 
-exports.getAllUsers = async (ctx, next) => {
+exports.getAllUsers = async (req, res) => {
   try {
     const result = await User.findAll();
-    ctx.status = 200;
-    ctx.body = { data: result };
-  } catch (err) {
-    ctx.throw(500, err);
+    res.json({ data: result });
+    res.status(200);
+  } catch (error) {
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.getUser = async (ctx, next) => {
+exports.getUser = async (req, res) => {
   try {
-    const result = await User.findByPk(ctx.params.id, {
+    const result = await User.findByPk(req.params.id, {
       include: [
         {
           model: RefreshToken,
-          as: "refreshToken",
-          attributes: ["id", "value"],
+          as: 'refreshToken',
+          attributes: ['id', 'value'],
         },
       ],
     });
-    ctx.status = 200;
-    ctx.body = { data: result };
-  } catch (err) {
-    ctx.throw(500, err);
+    res.status(200);
+    res.json({ data: result });
+  } catch (error) {
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.createNewUser = async (ctx, next) => {
-  const { firstName, lastName, email, password, profilePicture } =
-    ctx.request.body;
+exports.createNewUser = async (req, res) => {
+  const { firstName, lastName, email, password, profilePicture } = req.body;
   try {
     const user = await User.create({
       firstName,
@@ -49,37 +50,40 @@ exports.createNewUser = async (ctx, next) => {
     });
 
     await RefreshToken.create({ userId: user.id, value: null });
-    ctx.body = { user };
-  } catch (err) {
-    ctx.throw(500, err);
+    res.json({ user });
+    res.status(200);
+  } catch (error) {
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.deleteUser = async (ctx, next) => {
+exports.deleteUser = async (req, res) => {
   try {
-    await User.destroy({ where: { id: ctx.params.id } });
-    ctx.status = 204;
+    await User.destroy({ where: { id: req.params.id } });
+    req.status(204).end();
   } catch (err) {
-    ctx.throw(500, err);
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.login = async (ctx, next) => {
+exports.login = async (req, res) => {
   try {
-    const { email, password } = ctx.request.body;
+    const { email, password } = req.body;
     const userData = await User.findOne({ where: { email } });
 
     if (!userData) {
-      ctx.status = 404;
-      ctx.body = { error: "User not found." };
+      res.status(404);
+      res.json({ error: 'User not found.' });
       return;
     }
 
     const isValid = await userData?.validPassword(password);
 
     if (!isValid) {
-      ctx.status = 403;
-      ctx.body = { error: "Password is incorrect." };
+      res.status(403);
+      res.json({ error: 'Password is incorrect.' });
       return;
     }
 
@@ -98,38 +102,40 @@ exports.login = async (ctx, next) => {
       { where: { userId: userData.id } }
     );
 
-    ctx.body = { tokenType: "Bearer", accessToken, refreshToken };
-  } catch (err) {
-    ctx.throw(500, err);
+    res.json({ tokenType: 'Bearer', accessToken, refreshToken });
+  } catch (error) {
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.logout = async (ctx, next) => {
+exports.logout = async (req, res) => {
   try {
     const result = await RefreshToken.update(
       { value: null },
-      { where: { userId: ctx.params.userId } }
+      { where: { userId: req.params.userId } }
     );
-    ctx.status = 204;
-  } catch (err) {
-    ctx.throw(500, err);
+    res.status(204).end();
+  } catch (error) {
+    res.json({ error });
+    res.status(500);
   }
 };
 
-exports.renewToken = async (ctx, next) => {
-  const { refreshToken, userId } = ctx.request.body;
+exports.renewToken = async (req, res) => {
+  const { refreshToken, userId } = req.body;
 
   const dbRefreshToken = await RefreshToken.findOne({
     where: { userId },
   });
 
   if (refreshToken == null) {
-    ctx.status = 401;
+    res.status(401).end();
     return null;
   }
   if (dbRefreshToken?.value !== refreshToken) {
-    ctx.status = 403;
+    res.status(403).end();
     return null;
   }
-  verifyRefreshToken(ctx, refreshToken);
+  verifyRefreshToken(res, refreshToken);
 };

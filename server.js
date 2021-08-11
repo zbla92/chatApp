@@ -1,16 +1,18 @@
-const Koa = require("koa");
-const path = require("path");
-const cors = require("kcors");
-const bodyParser = require("koa-bodyparser");
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
 
-const app = new Koa();
-const bcrypt = require("bcrypt");
-const { User } = require("./models");
+const bcrypt = require('bcrypt');
+const { User } = require('./models');
+
+const userRouter = require('./routes/user');
+
+const app = express();
 
 const PORT = process.env.PORT || 4000;
 app.use(cors());
-app.use(bodyParser());
+app.use(express.json());
 
-require("./routes")(app);
+app.use('/user', userRouter);
 
 app.listen(PORT, console.log(`Server running at port ${PORT}`));
