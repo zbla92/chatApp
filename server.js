@@ -1,18 +1,19 @@
 const express = require('express');
-const path = require('path');
 const cors = require('cors');
+var http = require('http');
 
-const bcrypt = require('bcrypt');
-const { User } = require('./models');
-
+const { socketIO } = require('./config/socketio');
 const userRouter = require('./routes/user');
 
 const app = express();
+const server = http.createServer(app);
 
 const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
+socketIO(server);
+
 app.use('/user', userRouter);
 
-app.listen(PORT, console.log(`Server running at port ${PORT}`));
+server.listen(PORT, console.log(`Server running at port ${PORT}`));

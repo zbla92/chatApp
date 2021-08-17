@@ -38,6 +38,16 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getAuthUser = async (req, res) => {
+  try {
+    res.status(200);
+    res.json({ user: req.userData });
+  } catch (err) {
+    res.json({ error });
+    res.status(500);
+  }
+};
+
 exports.createNewUser = async (req, res) => {
   const { firstName, lastName, email, password, profilePicture } = req.body;
   try {
