@@ -23,5 +23,9 @@ exports.socketIO = (server) => {
 
       socket.emit('testBruh', { who: activeConnections });
     });
+
+    socket.on('disconnect', (args) => {
+      delete activeConnections[socket.handshake.query.userId];
+    });
   });
 };
