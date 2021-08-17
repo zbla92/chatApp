@@ -3,6 +3,7 @@ const express = require('express');
 const { jwtAuth } = require('../config/auth');
 const {
   getAllUsers,
+  getAuthUser,
   createNewUser,
   deleteUser,
   login,
@@ -14,7 +15,8 @@ const {
 const router = express.Router();
 
 router.get('/', jwtAuth, getAllUsers);
-router.get('/:id', getUser);
+router.get('/auth', jwtAuth, getAuthUser);
+router.get('/:id', jwtAuth, getUser);
 router.post('/create', createNewUser);
 router.delete('/:id', deleteUser);
 router.post('/login', login);

@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 exports.jwtAuth = async (req, res, next) => {
-  const authHeader = req.header['authorization'];
-  console.log(authHeader, 'header');
+  const authHeader = req.headers['authorization'];
+
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) {
@@ -14,6 +14,7 @@ exports.jwtAuth = async (req, res, next) => {
     token,
     process.env.ACCESS_TOKEN_SECRET,
     async (err, user) => {
+      req.userData = user.user;
       if (err) return res.status(403);
       await next();
     }
