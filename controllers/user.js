@@ -104,8 +104,11 @@ exports.login = async (req, res) => {
       lastName: userData.lastName,
     };
 
-    const accessToken = generateAccessToken({ user });
-    const refreshToken = generateRefreshToken({ user });
+    const accessToken = generateAccessToken({
+      ...user,
+      profilePicture: userData.profilePicture,
+    });
+    const refreshToken = generateRefreshToken(user);
 
     await RefreshToken.update(
       { value: refreshToken },

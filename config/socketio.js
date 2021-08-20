@@ -15,13 +15,31 @@ exports.socketIO = (server) => {
   io.on('connection', (socket) => {
     console.log(socket.id, 'connected ');
 
-    const { userId, userEmail } = socket.handshake.query;
-    activeConnections[userId] = { id: socket.id, userEmail };
+    socket.emit('online_friends', {
+      friends: Object.values(activeConnections),
+    });
+
+    const { userId, userEmail, name, profilePicture } = socket.handshake.query;
+    activeConnections[userId] = {
+      id: socket.id,
+      userId,
+      userEmail,
+      name,
+      profilePicture: profilePicture !== 'undefined' ? profilePicture : null,
+    };
 
     socket.on('chat', (args) => {
       console.log(args); // world
+    });
 
-      socket.emit('testBruh', { who: activeConnections });
+    setInterval(() => {
+      socket.emit('online_friends', {
+        friends: Object.values(activeConnections),
+      });
+    }, 5000);
+
+    socket.on('disconnect', (args) => {
+      delete activeConnections[socket.handshake.query.userId];
     });
   });
 };
