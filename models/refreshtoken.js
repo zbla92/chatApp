@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   RefreshToken.init(
     {
-      value: DataTypes.STRING,
+      value: DataTypes.STRING(1234),
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
