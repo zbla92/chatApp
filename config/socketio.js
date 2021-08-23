@@ -41,5 +41,12 @@ exports.socketIO = (server) => {
     socket.on('disconnect', (args) => {
       delete activeConnections[socket.handshake.query.userId];
     });
+
+    socket.on('direct_message', (data) => {
+      io.to(data.to).emit('direct_message', {
+        message: data.message,
+        from: data.fromUserId,
+      });
+    });
   });
 };
