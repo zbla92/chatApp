@@ -2,6 +2,10 @@ const { Server } = require('socket.io');
 
 const activeConnections = {};
 
+const getSocketIdFromUserId = (userId) => {
+  return activeConnections[userId].id;
+};
+
 /**
  * @param {object} server instance of server craeted with http.createServer
  */
@@ -13,8 +17,6 @@ exports.socketIO = (server) => {
   });
 
   io.on('connection', (socket) => {
-    console.log(socket.id, 'connected ');
-
     socket.emit('online_friends', {
       friends: Object.values(activeConnections),
     });
@@ -28,10 +30,6 @@ exports.socketIO = (server) => {
       profilePicture: profilePicture !== 'undefined' ? profilePicture : null,
     };
 
-    socket.on('chat', (args) => {
-      console.log(args); // world
-    });
-
     setInterval(() => {
       socket.emit('online_friends', {
         friends: Object.values(activeConnections),
@@ -40,10 +38,15 @@ exports.socketIO = (server) => {
 
     socket.on('disconnect', (args) => {
       delete activeConnections[socket.handshake.query.userId];
+      socket.disconnect(0);
+    });
+
+    socket.on('end', (args) => {
+      socket.disconnect(0);
     });
 
     socket.on('direct_message', (data) => {
-      io.to(data.to).emit('direct_message', {
+      io.to(getSocketIdFromUserId(data.toUserId)).emit('direct_message', {
         message: data.message,
         from: data.fromUserId,
       });
