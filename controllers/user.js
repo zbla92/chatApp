@@ -6,6 +6,7 @@ const {
   jwtAuth,
   verifyRefreshToken,
 } = require('../config/auth');
+const { uploadFile } = require('../config/googleDrive');
 require('dotenv').config();
 
 exports.getAllUsers = async (req, res) => {
@@ -151,4 +152,21 @@ exports.renewToken = async (req, res) => {
     return null;
   }
   verifyRefreshToken(res, refreshToken);
+};
+
+exports.uploadProfilePicture = async (req, res) => {
+  const profilePictureLink = await uploadFile(req.files[0].filename);
+
+  if (profilePictureLink) {
+    await User.update(
+      {
+        profilePicture: `https://drive.google.com/uc?id=${profilePictureLink}`,
+      },
+      { where: { id: req.userData.id } }
+    );
+
+    res.status(204).end();
+  } else res.status(400).end();
+
+  console.log(req.files[0], req.body);
 };
