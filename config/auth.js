@@ -9,13 +9,14 @@ exports.jwtAuth = async (req, res, next) => {
   if (token == null) {
     res.status(401).end();
   }
-
+  console.log('verifikacija pocela');
   await jwt.verify(
     token,
     process.env.ACCESS_TOKEN_SECRET,
     async (err, user) => {
       req.userData = user;
       if (err) return res.status(403);
+      console.log('verifikacija zavrsila');
       await next();
     }
   );
