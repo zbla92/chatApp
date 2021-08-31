@@ -25,7 +25,7 @@ router.get('/:id', jwtAuth, getUser);
 router.post('/create', createNewUser);
 router.delete('/:id', deleteUser);
 router.post('/login', login);
-router.post('/logout/:userId', logout);
+router.post('/logout/:id', logout);
 router.post('/auth/refresh', renewToken);
 router.post(
   '/avatar',
