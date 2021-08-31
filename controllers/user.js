@@ -105,10 +105,7 @@ exports.login = async (req, res) => {
       lastName: userData.lastName,
     };
 
-    const accessToken = generateAccessToken({
-      ...user,
-      profilePicture: userData.profilePicture,
-    });
+    const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
     await RefreshToken.update(
@@ -127,8 +124,9 @@ exports.logout = async (req, res) => {
   try {
     const result = await RefreshToken.update(
       { value: null },
-      { where: { userId: req.params.userId } }
+      { where: { userId: req.params.id } }
     );
+
     res.status(204).end();
   } catch (error) {
     res.json({ error });
@@ -137,26 +135,28 @@ exports.logout = async (req, res) => {
 };
 
 exports.renewToken = async (req, res) => {
-  const { refreshToken, userId } = req.body;
+  const { refreshToken } = req.body;
 
   const dbRefreshToken = await RefreshToken.findOne({
-    where: { userId },
+    where: { value: refreshToken },
   });
 
   if (refreshToken == null) {
     res.status(401).end();
     return null;
   }
+
   if (dbRefreshToken?.value !== refreshToken) {
     res.status(403).end();
     return null;
   }
-  verifyRefreshToken(res, refreshToken);
+  const result = await verifyRefreshToken(res, refreshToken);
+  res.status(200);
+  res.json({ accessToken: result });
 };
 
 exports.uploadProfilePicture = async (req, res) => {
   const profilePictureLink = await uploadFile(req.files[0].filename);
-
   if (profilePictureLink) {
     await User.update(
       {
