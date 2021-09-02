@@ -4,6 +4,7 @@ var http = require('http');
 
 const { socketIO } = require('./config/socketio');
 const userRouter = require('./routes/user');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,5 +16,6 @@ app.use(express.json());
 socketIO(server);
 
 app.use('/user', userRouter);
+app.use('/auth', authRouter);
 
 server.listen(PORT, console.log(`Server running at port ${PORT}`));
