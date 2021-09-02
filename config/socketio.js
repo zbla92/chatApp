@@ -17,10 +17,6 @@ exports.socketIO = (server) => {
   });
 
   io.on('connection', (socket) => {
-    socket.emit('online_friends', {
-      friends: Object.values(activeConnections),
-    });
-
     const { userId, userEmail, name, profilePicture } = socket.handshake.query;
     activeConnections[userId] = {
       id: socket.id,
@@ -30,15 +26,16 @@ exports.socketIO = (server) => {
       profilePicture: profilePicture !== 'undefined' ? profilePicture : null,
     };
 
-    setInterval(() => {
-      socket.emit('online_friends', {
-        friends: Object.values(activeConnections),
-      });
-    }, 5000);
+    io.emit('online_friends', {
+      friends: Object.values(activeConnections),
+    });
 
     socket.on('disconnect', (args) => {
       delete activeConnections[socket.handshake.query.userId];
       socket.disconnect(0);
+      io.emit('online_friends', {
+        friends: Object.values(activeConnections),
+      });
     });
 
     socket.on('end', (args) => {
