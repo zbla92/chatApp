@@ -1,12 +1,16 @@
 const { User, RefreshToken } = require('../models');
 
 const { uploadFile } = require('../config/googleDrive');
+const { standardizeUser } = require('../utils/user-utils');
 require('dotenv').config();
 
 exports.getAllUsers = async (req, res) => {
   try {
     const result = await User.findAll();
-    res.json({ data: result });
+
+    const prepUsers = result?.map((user) => standardizeUser(user));
+
+    res.json({ data: prepUsers });
     res.status(200);
   } catch (error) {
     res.json({ error });
