@@ -1,9 +1,9 @@
 const { Server } = require('socket.io');
 
-const activeConnections = {};
+exports.activeConnections = {};
 
 const getSocketIdFromUserId = (userId) => {
-  return activeConnections[userId].id;
+  return this.activeConnections[userId].id;
 };
 
 /**
@@ -18,23 +18,27 @@ exports.socketIO = (server) => {
 
   io.on('connection', (socket) => {
     const { userId, userEmail, name, profilePicture } = socket.handshake.query;
-    activeConnections[userId] = {
+    this.activeConnections[userId] = {
       id: socket.id,
       userId,
       userEmail,
       name,
       profilePicture: profilePicture !== 'undefined' ? profilePicture : null,
+      online: true,
     };
 
-    io.emit('online_friends', {
-      friends: Object.values(activeConnections),
+    socket.broadcast.emit('friend_connected', {
+      userId,
+      userEmail,
+      name,
+      online: true,
     });
 
     socket.on('disconnect', (args) => {
-      delete activeConnections[socket.handshake.query.userId];
+      delete this.activeConnections[socket.handshake.query.userId];
       socket.disconnect(0);
-      io.emit('online_friends', {
-        friends: Object.values(activeConnections),
+      socket.broadcast.emit('friend_disconnected', {
+        userId: socket.handshake.query.userId,
       });
     });
 
