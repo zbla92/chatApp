@@ -7,6 +7,7 @@ const {
   jwtAuth,
   verifyRefreshToken,
 } = require('../config/auth');
+const { standardizeUser } = require('../utils/user-utils');
 
 exports.login = async (req, res) => {
   try {
@@ -66,8 +67,10 @@ exports.logout = async (req, res) => {
 
 exports.getAuthUser = async (req, res) => {
   try {
+    const user = await User.findByPk(req.userData.id);
+
     res.status(200);
-    res.json({ user: req.userData });
+    res.json({ user: standardizeUser(user) });
   } catch (err) {
     res.json({ error });
     res.status(500);
