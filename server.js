@@ -6,6 +6,7 @@ const { socketIO } = require('./config/socketio');
 const userRouter = require('./routes/user');
 const authRouter = require('./routes/auth');
 const friendsRouter = require('./routes/friends');
+const messagesRouter = require('./routes/message');
 
 const app = express();
 const server = http.createServer(app);
@@ -19,5 +20,6 @@ socketIO(server);
 app.use('/user', userRouter);
 app.use('/auth', authRouter);
 app.use('/friends', friendsRouter);
+app.use('/messages', messagesRouter);
 
 server.listen(PORT, console.log(`Server running at port ${PORT}`));

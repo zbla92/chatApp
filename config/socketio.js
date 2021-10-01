@@ -1,4 +1,5 @@
 const { Server } = require('socket.io');
+const { Message } = require('../models');
 
 exports.activeConnections = {};
 
@@ -46,10 +47,15 @@ exports.socketIO = (server) => {
       socket.disconnect(0);
     });
 
-    socket.on('direct_message', (data) => {
+    socket.on('direct_message', async (data) => {
       io.to(getSocketIdFromUserId(data.toUserId)).emit('direct_message', {
         message: data.message,
         from: data.fromUserId,
+      });
+      await Message.create({
+        recipientId: data.toUserId,
+        senderId: data.fromUserId,
+        content: data.message,
       });
     });
   });
