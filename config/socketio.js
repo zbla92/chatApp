@@ -55,7 +55,7 @@ exports.socketIO = (server) => {
       await Message.create({
         recipientId: data.toUserId,
         senderId: data.fromUserId,
-        content: data.message,
+        message: data.message,
       });
     });
   });

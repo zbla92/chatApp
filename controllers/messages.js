@@ -1,4 +1,8 @@
 const { Message } = require('../models');
+const {
+  generateConversationId,
+  standardizeMessages,
+} = require('../utils/message-utils');
 
 exports.postMessage = async (req, res) => {
   const { recipientId, senderId, content } = req.body;
@@ -27,8 +31,7 @@ exports.getMessages = async (req, res) => {
   try {
     const result = await Message.findAndCountAll({
       where: {
-        recipientId: recipientId.toString(),
-        senderId: senderId.toString(),
+        conversationId: generateConversationId(recipientId, senderId),
       },
       limit,
       offset,
@@ -36,9 +39,10 @@ exports.getMessages = async (req, res) => {
 
     result.maxPage = result.count / limit;
 
-    res.json({ data: result });
+    res.json({ data: standardizeMessages(result) });
     res.status(200);
   } catch (error) {
+    console.log(error, 'erro');
     res.json({ error });
     res.status(500);
   }

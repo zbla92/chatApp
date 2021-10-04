@@ -6,31 +6,46 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+      },
+      conversationId: {
+        type: Sequelize.STRING,
       },
       recipientId: {
-        type: Sequelize.STRING
+        allowNull: false,
+        type: Sequelize.STRING,
       },
       senderId: {
-        type: Sequelize.STRING
+        allowNull: false,
+        type: Sequelize.STRING,
       },
-      content: {
-        type: Sequelize.STRING
+      message: {
+        allowNull: false,
+        type: Sequelize.STRING,
       },
       edited: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      read: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      seen: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Messages');
-  }
+  },
 };
