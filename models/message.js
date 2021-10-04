@@ -1,6 +1,6 @@
-"use strict";
 const { Model } = require("sequelize");
 const { generateConversationId } = require("../utils/message-utils");
+
 module.exports = (sequelize, DataTypes) => {
 	class Message extends Model {
 		/**
