@@ -5,6 +5,6 @@ const { getMessages } = require("../controllers/messages");
 
 const router = express.Router();
 
-router.get("/", jwtAuth, getMessages);
+router.post("/", jwtAuth, getMessages);
 
 module.exports = router;

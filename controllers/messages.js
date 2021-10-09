@@ -25,7 +25,7 @@ exports.postMessage = async (req, res) => {
 exports.getMessages = async (req, res) => {
 	const { recipientId, senderId, page } = req.body;
 
-	const limit = 2;
+	const limit = 10;
 	const offset = (page - 1) * limit;
 
 	try {
@@ -35,9 +35,10 @@ exports.getMessages = async (req, res) => {
 			},
 			limit,
 			offset,
+			order: [["id", "DESC"]],
 		});
 
-		result.maxPage = result.count / limit;
+		result.maxPage = Math.ceil(result.count / limit);
 
 		res.json({ data: standardizeMessages(result) });
 		res.status(200);

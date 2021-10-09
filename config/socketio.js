@@ -48,13 +48,21 @@ exports.socketIO = (server) => {
 		});
 
 		socket.on("direct_message", async (data) => {
-			io.to(getSocketIdFromUserId(data.toUserId)).emit("direct_message", {
-				message: data.message,
-				from: data.fromUserId,
-			});
+			io.to(getSocketIdFromUserId(data.recipientId)).emit(
+				"direct_message",
+				{
+					message: data.message,
+					senderId: data.senderId,
+					recipientId: data.recipientId,
+					edited: null,
+					read: null,
+					seen: null,
+					time: new Date(),
+				}
+			);
 			await Message.create({
-				recipientId: data.toUserId,
-				senderId: data.fromUserId,
+				recipientId: data.recipientId,
+				senderId: data.senderId,
 				message: data.message,
 			});
 		});
