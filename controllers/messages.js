@@ -39,8 +39,9 @@ exports.getMessages = async (req, res) => {
 		});
 
 		result.maxPage = Math.ceil(result.count / limit);
+		result.currentPage = page;
 
-		res.json({ data: standardizeMessages(result) });
+		res.json(standardizeMessages(result));
 		res.status(200);
 	} catch (error) {
 		res.json({ error });

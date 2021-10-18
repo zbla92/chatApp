@@ -14,12 +14,15 @@ exports.standardizeMessage = (message) => ({
 });
 
 exports.standardizeMessages = (data) => {
-	const { rows, maxPage, count } = data;
+	const { rows, maxPage, count, currentPage } = data;
 
 	return {
 		count: count || null,
 		maxPage: maxPage || null,
-		messages: rows.map((message) => this.standardizeMessage(message)),
+		currentPage: currentPage || null,
+		messages: rows
+			.map((message) => this.standardizeMessage(message))
+			.reverse(),
 	};
 };
 
