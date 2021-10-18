@@ -23,10 +23,14 @@ exports.postMessage = async (req, res) => {
 };
 
 exports.getMessages = async (req, res) => {
-	const { recipientId, senderId, page } = req.body;
+	const { recipientId, senderId, page, messagesOffset = 0 } = req.body;
 
 	const limit = 10;
-	const offset = (page - 1) * limit;
+	const recalculatedMessagesOffset = messagesOffset % limit;
+
+	const offsetPage = Math.floor(messagesOffset / limit);
+
+	const offset = (page + offsetPage - 1) * limit + recalculatedMessagesOffset;
 
 	try {
 		const result = await Message.findAndCountAll({
@@ -39,7 +43,9 @@ exports.getMessages = async (req, res) => {
 		});
 
 		result.maxPage = Math.ceil(result.count / limit);
-		result.currentPage = page;
+		result.currentPage = page + offsetPage;
+		result.messagesOffset = recalculatedMessagesOffset;
+		result.perPage = limit;
 
 		res.json(standardizeMessages(result));
 		res.status(200);

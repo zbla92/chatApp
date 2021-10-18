@@ -4,6 +4,7 @@
  * @returns {Object}        Stripped down message object
  */
 exports.standardizeMessage = (message) => ({
+	id: message.id || null,
 	message: message.message || null,
 	senderId: message.senderId || null,
 	recipientId: message.recipientId || null,
@@ -14,12 +15,13 @@ exports.standardizeMessage = (message) => ({
 });
 
 exports.standardizeMessages = (data) => {
-	const { rows, maxPage, count, currentPage } = data;
+	const { rows, maxPage, count, currentPage, messagesOffset } = data;
 
 	return {
-		count: count || null,
-		maxPage: maxPage || null,
-		currentPage: currentPage || null,
+		count: count || 0,
+		maxPage: maxPage || 0,
+		currentPage: currentPage || 0,
+		messagesOffset: messagesOffset || 0,
 		messages: rows
 			.map((message) => this.standardizeMessage(message))
 			.reverse(),

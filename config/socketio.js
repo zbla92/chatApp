@@ -48,23 +48,26 @@ exports.socketIO = (server) => {
 		});
 
 		socket.on("direct_message", async (data) => {
+			const result = await Message.create({
+				recipientId: data.recipientId,
+				senderId: data.senderId,
+				message: data.message,
+			});
+			console.log(result, "rezultati");
+
 			io.to(getSocketIdFromUserId(data.recipientId)).emit(
 				"direct_message",
 				{
+					id: data.id,
 					message: data.message,
 					senderId: data.senderId,
 					recipientId: data.recipientId,
 					edited: null,
 					read: null,
 					seen: null,
-					time: new Date(),
+					time: result.createdAt,
 				}
 			);
-			await Message.create({
-				recipientId: data.recipientId,
-				senderId: data.senderId,
-				message: data.message,
-			});
 		});
 	});
 };
