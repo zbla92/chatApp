@@ -1,10 +1,10 @@
 const express = require("express");
-
 const { jwtAuth } = require("../config/auth");
-const { getOnlineFriends } = require("../controllers/friends");
+
+const { getMessages } = require("../controllers/messages");
 
 const router = express.Router();
 
-router.get("/online", jwtAuth, getOnlineFriends);
+router.post("/", jwtAuth, getMessages);
 
 module.exports = router;

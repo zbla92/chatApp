@@ -1,99 +1,100 @@
-const { User, RefreshToken } = require('../models');
+const { User, RefreshToken } = require("../models");
 
 const {
-  generateAccessToken,
-  generateRefreshToken,
-  destroyToken,
-  jwtAuth,
-  verifyRefreshToken,
-} = require('../config/auth');
-const { standardizeUser } = require('../utils/user-utils');
+	generateAccessToken,
+	generateRefreshToken,
+	destroyToken,
+	jwtAuth,
+	verifyRefreshToken,
+} = require("../config/auth");
+const { standardizeUser } = require("../utils/user-utils");
 
 exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log('eo u loginu', email, password);
-    const userData = await User.findOne({ where: { email } });
+	try {
+		const { email, password } = req.body;
+		console.log("eo u loginu", email, password);
+		const userData = await User.findOne({ where: { email } });
 
-    if (!userData) {
-      res.status(404);
-      res.json({ error: 'User not found.' });
-      return;
-    }
+		if (!userData) {
+			res.status(404);
+			res.json({ error: "User not found." });
+			return;
+		}
 
-    const isValid = await userData?.validPassword(password);
+		const isValid = await userData?.validPassword(password);
 
-    if (!isValid) {
-      res.status(403);
-      res.json({ error: 'Password is incorrect.' });
-      return;
-    }
+		if (!isValid) {
+			res.status(403);
+			res.json({ error: "Password is incorrect." });
+			return;
+		}
 
-    const user = {
-      email: userData.email,
-      id: userData.id,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-    };
+		const user = {
+			email: userData.email,
+			id: userData.id,
+			firstName: userData.firstName,
+			lastName: userData.lastName,
+		};
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+		const accessToken = generateAccessToken(user);
+		const refreshToken = generateRefreshToken(user);
 
-    await RefreshToken.update(
-      { value: refreshToken },
-      { where: { userId: userData.id } }
-    );
+		await RefreshToken.update(
+			{ value: refreshToken },
+			{ where: { userId: userData.id } }
+		);
 
-    res.json({ tokenType: 'Bearer', accessToken, refreshToken });
-  } catch (error) {
-    res.json({ error });
-    res.status(500);
-  }
+		res.json({ tokenType: "Bearer", accessToken, refreshToken });
+	} catch (error) {
+		res.json({ error });
+		res.status(500);
+	}
 };
 
 exports.logout = async (req, res) => {
-  try {
-    const result = await RefreshToken.update(
-      { value: null },
-      { where: { userId: req.params.id } }
-    );
+	try {
+		const result = await RefreshToken.update(
+			{ value: null },
+			{ where: { userId: req.params.id } }
+		);
 
-    res.status(204).end();
-  } catch (error) {
-    res.json({ error });
-    res.status(500);
-  }
+		res.status(204).end();
+	} catch (error) {
+		res.json({ error });
+		res.status(500);
+	}
 };
 
 exports.getAuthUser = async (req, res) => {
-  try {
-    const user = await User.findByPk(req.userData.id);
+	try {
+		const user = await User.findByPk(req.userData.id);
 
-    res.status(200);
-    res.json({ user: standardizeUser(user) });
-  } catch (err) {
-    res.json({ error });
-    res.status(500);
-  }
+		res.status(200);
+		res.json({ user: standardizeUser(user) });
+	} catch (error) {
+		res.json({ error });
+		res.status(500);
+	}
 };
 
+// eslint-disable-next-line consistent-return
 exports.renewToken = async (req, res) => {
-  const { refreshToken } = req.body;
+	const { refreshToken } = req.body;
 
-  const dbRefreshToken = await RefreshToken.findOne({
-    where: { value: refreshToken },
-  });
+	const dbRefreshToken = await RefreshToken.findOne({
+		where: { value: refreshToken },
+	});
 
-  if (refreshToken == null) {
-    res.status(401).end();
-    return null;
-  }
+	if (refreshToken == null) {
+		res.status(401).end();
+		return null;
+	}
 
-  if (dbRefreshToken?.value !== refreshToken) {
-    res.status(403).end();
-    return null;
-  }
-  const result = await verifyRefreshToken(res, refreshToken);
-  res.status(200);
-  res.json({ accessToken: result });
+	if (dbRefreshToken?.value !== refreshToken) {
+		res.status(403).end();
+		return null;
+	}
+	const result = await verifyRefreshToken(res, refreshToken);
+	res.status(200);
+	res.json({ accessToken: result });
 };
