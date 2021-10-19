@@ -25,7 +25,7 @@ exports.postMessage = async (req, res) => {
 exports.getMessages = async (req, res) => {
 	const { recipientId, senderId, page, messagesOffset = 0 } = req.body;
 
-	const limit = 10;
+	const limit = 20;
 	const recalculatedMessagesOffset = messagesOffset % limit;
 
 	const offsetPage = Math.floor(messagesOffset / limit);
