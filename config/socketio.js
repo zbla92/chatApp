@@ -53,11 +53,10 @@ exports.socketIO = (server) => {
 				senderId: data.senderId,
 				message: data.message,
 			});
-			console.log(result, "rezultati");
+			const recipientSocketId = getSocketIdFromUserId(data.recipientId);
 
-			io.to(getSocketIdFromUserId(data.recipientId)).emit(
-				"direct_message",
-				{
+			if (recipientSocketId)
+				io.to(recipientSocketId).emit("direct_message", {
 					id: data.id,
 					message: data.message,
 					senderId: data.senderId,
@@ -66,8 +65,7 @@ exports.socketIO = (server) => {
 					read: null,
 					seen: null,
 					time: result.createdAt,
-				}
-			);
+				});
 		});
 	});
 };
